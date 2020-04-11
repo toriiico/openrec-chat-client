@@ -27,7 +27,7 @@ let giftDraw = (giftId, count, senderName, message) => {
     let giftPoint = 1;
     if(!message) message = '';
     if(!count) count = 1;
-    
+
     giftList.forEach((val) => {
         if(giftId == val.id){
             giftName = val.name;
@@ -36,8 +36,8 @@ let giftDraw = (giftId, count, senderName, message) => {
             giftPoint = val.points;
         }
     });
-    
-    
+
+
     drawArea.append('<div class="chat gift">[エール] '+senderName+' '+message+'('+giftPrice+'yells)</div>');
     speechText(senderName+'さんからエールが届きました。'+message, 'gift');
     statusCheck();
@@ -52,13 +52,13 @@ let chatDraw = (text, name, iconUrl, color, stamp) => {
     }
     if(!color) color = "black";
     speechText(text, 'comment');
-    
+
     if(stamp) text = '<img src="'+stamp.image_url+'" class="stamp">';
-    
+
     let insertTag = '';
     if(userIcon) insertTag = '<div class="chat comment"><div id="name" style="color: '+color+';"><img src="'+iconUrl+'" class="iconSize"> '+name+'</div><div id="text">'+text+'</div></div>';
     else insertTag = '<div class="chat comment"><div id="name">'+name+'</div><div id="text">'+text+'</div></div>';
-    
+
     drawArea.append(insertTag);
     statusCheck();
 }
@@ -71,7 +71,7 @@ let noticeDraw = (text, type) => {
     let insertTag = '<div class="chat notice '+type+'">';
     if(type != 'debug') insertTag += '<img src="https://dqd0jw5gvbchn.cloudfront.net/tv/v8.11.0/static/images/favicons/favicon.ico" class="iconSize"> ';
     insertTag += text+'</div>';
-    
+
     drawArea.append(insertTag);
     speechText(text, type);
     statusCheck();
@@ -93,20 +93,20 @@ let speechText = (text, type) => {
         case 'comment':
             if(!chkbxCommentStatus) return;
             break;
-        
+
         case 'gift':
             if(!chkbxGiftStatus) return;
             break;
-        
+
         case 'follow':
             if(!chkbxFollowStatus) return;
             break;
-        
+
         case 'onAdd':
             if(!chkbxOnAddStatus) return;
             break;
     }
-    
+
     let ssu = new SpeechSynthesisUtterance(text);
     ssu.lang = 'ja-JP';
     ssu.rate = 1.5;

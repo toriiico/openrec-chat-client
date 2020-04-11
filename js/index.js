@@ -29,12 +29,12 @@ class urlParam {
         let t = Math.floor(d.getTime()/1000);
         paramText += '&t='+t;
         paramText += '&v='+currentVer.replace(/[^0-9]/g, '');
-        
+
         $('#previewFrame').attr('src', baseUrl+paramText+'&demoMode=true&rnd='+Math.random());
-        
-        if(this.demoMode)paramText += '&demoMode='+this.demoMode;    
+
+        if(this.demoMode)paramText += '&demoMode='+this.demoMode;
         $('#outputUrl').val(baseUrl+paramText);
-        
+
         if(!this.channelId) $('#outputUrl').val('チャンネルIDは必須です');
     }
 }

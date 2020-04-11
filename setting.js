@@ -19,10 +19,10 @@ let channelId = getParam('channelId') || '';
 // 流れるコメントに@名前を含める(含める場合はtrue)
 const chatInUserName = getParam('chatInUserName') || false;
 
-// 流れるコメントの色をユーザが設定した色にするか   
+// 流れるコメントの色をユーザが設定した色にするか
 const chatColorMode = getParam('chatColorMode') || false;
 
-// コメントが流れる速度（少ないほど早い） 
+// コメントが流れる速度（少ないほど早い）
 const chatSpeed = parseInt(getParam('chatSpeed')) || 7000;
 
  // 流れるコメントの最大表示文字数

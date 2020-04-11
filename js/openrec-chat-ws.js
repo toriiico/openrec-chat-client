@@ -12,7 +12,7 @@ let handshakeLoop, getMovieIdLoop;
 let startConnect = () => {
     if(demoMode) return;
     noticeDraw('放送が始まるのを待機しています...', 'viewerOnly');
-    
+
     getMovieId().done((json) => {
         let onairId;
         json.forEach((val) => {
@@ -24,7 +24,7 @@ let startConnect = () => {
         });
         if(onairId) {
             wsConnect(onairId);
-            
+
         } else {
             console.log('getMovieId success(not onair)');
             getMovieIdLoop = setTimeout(startConnect, 7000);
@@ -51,10 +51,10 @@ let getGiftList = () => {
 
 let randText = (type, len) => {
     let p = 36;
-    
+
     if(type == 'Int') p = 10;
     if(!len) len = 10;
-    
+
     return Math.random().toString(p).slice(0-len);
 }
 
@@ -83,7 +83,7 @@ let chatTest = (name, text, stamp, yell) => {
             ticker_seconds: 10,
         }
     }
-    
+
     let provJson = {
         "movie_id": 1623780,
         "live_type": 1,
@@ -123,7 +123,7 @@ let chatTest = (name, text, stamp, yell) => {
         "del_flg": 0,
         "badges": []
     }
-    
+
     let messageJson = new Comment(provJson);
     messageJson.push();
 }
@@ -139,9 +139,9 @@ let demoModeStart = (is_yell) => {
     if(rnd >= 98) demoYell = 179;
     else if(rnd >= 88) demoStamp = 1;
     if(is_yell) demoYell = 179;
-    
+
     chatTest(demoName, demoText, demoStamp, demoYell);
-    
+
     let rnd2 = Math.floor(Math.random() * 1000);
     setTimeout(demoModeStart, rnd2);
 }
@@ -168,7 +168,7 @@ let wsConnect = (id) => {
     if(!id) return;
     let wsUri = 'wss://chat.openrec.tv/socket.io/?movieId='+id+'&EIO=3&transport=websocket';
     ws = new WebSocket(wsUri);
-    
+
     ws.onopen = (e) => { onOpen(e) };
     ws.onclose = (e) => { onClose(e) };
     ws.onmessage = (e) => { onMessage(e) };
@@ -178,7 +178,7 @@ let wsConnect = (id) => {
 let wsDisconnect = () => {
     try { ws.close(); }
     catch(e) {}
-    
+
     try { clearTimeout(getMovieIdLoop); }
     catch(e) {}
 }
@@ -197,7 +197,7 @@ let onClose = (e) => {
 
 let onMessage = (e) => {
     let rawText, json, unescapeed;
-    
+
     try {
         if(e.data == 3) {
             // handshakeを送った時の反応
@@ -217,7 +217,7 @@ let onMessage = (e) => {
             //unescapeed = rawText.replace(/\\"/g, '"');
             json = JSON.parse(rawText);
             json = JSON.parse(json);
-            
+
             if(json.type == 0){
                 // コメント
                 let messageJson = new Comment(json.data);
@@ -225,20 +225,20 @@ let onMessage = (e) => {
 
             } else if (json.type == 1) {
                 // 同時接続数と視聴数
-                
+
             } else if (json.type == 3) {
                 // 生放送が終了
                 console.log('live end');
                 wsDisconnect();
-                
+
             } else if (json.type == 10) {
                 // 放送タイプ(public_type)
-                
+
             } else {
                 console.log(json.type, json.data);
             }
         }
-    
+
     } catch(er){
         if(e.data) console.log(e.data);
         else console.log(e);
@@ -290,10 +290,10 @@ class Comment {
         if(this.is_moderator) this.user_name += '<img src="'+svgUrlBase+'/moderator.svg" class="mark">';
         if(this.is_fresh) this.user_name += '<img src="'+svgUrlBase+'/begginer.svg" class="mark">';
         if(this.is_warned) this.user_name += '<img src="'+svgUrlBase+'/warned.svg" class="mark">';
-        
+
         if(this.yell) giftDraw(this.yell.yell_id, 1, this.user_name, this.message, this.stamp);
         else chatDraw(this.message, this.user_name, this.user_icon, this.user_color, this.stamp);
-        
+
         return;
     }
 }
