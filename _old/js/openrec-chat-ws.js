@@ -218,6 +218,8 @@ let onMessage = (e) => {
             json = JSON.parse(rawText);
             json = JSON.parse(json);
 
+            console.log(json)
+
             if(json.type == 0){
                 // コメント
                 let messageJson = new Comment(json.data);
