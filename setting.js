@@ -10,6 +10,9 @@ let getParam = (name, url) => {
 
 const currentVer = 'v1.0.7';
 
+// チャット生成先URL
+const baseUrl = 'https://toriiico.github.io/openrec-chat-client/generator.html';
+
 // OPENRECのチャンネルID(https://www.openrec.tv/user/*****)
 let channelId = getParam('channelId') || '';
 

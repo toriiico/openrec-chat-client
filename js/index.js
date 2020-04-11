@@ -1,5 +1,3 @@
-const baseUrl = 'https://tokjin.github.io/openrec-chat-client/generator.html';
-
 class urlParam {
     constructor() {
         this.channelId = '';
