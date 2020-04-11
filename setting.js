@@ -1,4 +1,4 @@
-let getParam = (name, url) => {
+const getParam = (name, url) => {
     if (!url) url = window.location.href;
     name = name.replace(/[\[\]]/g, "\\$&");
     let regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
@@ -14,7 +14,7 @@ const currentVer = 'v1.0.7';
 const baseUrl = 'https://toriiico.github.io/openrec-chat-client/generator.html';
 
 // OPENRECのチャンネルID(https://www.openrec.tv/user/*****)
-let channelId = getParam('channelId') || '';
+const channelId = getParam('channelId') || '';
 
 // 流れるコメントに@名前を含める(含める場合はtrue)
 const chatInUserName = getParam('chatInUserName') || false;
