@@ -9,7 +9,7 @@ a:visited {
 }
 
 #copied-text {
-  display: none;
+  display: block;
   position: fixed;
   right: 500px;
   bottom: 15px;
