@@ -9,7 +9,7 @@ import "./index.css"
 // TODO: Audioをstateで持つ？
 
 // TODO: 一旦
-import { WebSocketManager, CommentDeliver, removeHtml } from "../../../../lib/utils"
+import { WebSocketManager, CommentDeliver, removeHtml, CommentObserver } from "../../../../lib/utils"
 import { demoModeStart, chatTest } from "../../../../lib/utils/demo"
 import { currentVer } from "../../../../lib/configs"
 import { updateGiftList, getMovieId } from "../../../../lib/utils/openrec"
@@ -82,10 +82,14 @@ const Component: FC<MainProps> = (props) => {
   const queryParams = new URLSearchParams(location.search)
 
   const [wsManager, setWsManager] = useState<WebSocketManager | null>(null)
+  const [commentObserver, setCommentObserver] = useState<CommentObserver>(new CommentObserver())
   const [onairInfo, setOnairInfo] = useState<{ id: string; title: string; channel: string } | null>(null)
-  const [giftList, setGiftList] = useState<Array<any> | null>(null)
   const [notice, setNotice] = useState("")
+  const [giftList, setGiftList] = useState<Array<any> | null>(null)
+  const [messageList, setMessageList] = useState<Array<any>>([])
+
   const onairObserverTimerRef = useRef<NodeJS.Timeout>()
+  const commentObserverTimerRef = useRef<NodeJS.Timeout>()
 
   useEffect(() => {
     // get gift list
@@ -112,7 +116,14 @@ const Component: FC<MainProps> = (props) => {
 
   useEffect(() => {
     if (onairInfo !== null) {
-      setWsManager(new WebSocketManager(onairInfo.id))
+      setWsManager(new WebSocketManager(onairInfo.id, commentObserver))
+
+      commentObserverTimerRef.current = setInterval(() => {
+        const comments = commentObserver.readers
+        console.log("observer")
+        console.log(comments)
+        setMessageList((prevState) => [...comments])
+      }, 500)
     }
   }, [onairInfo])
 
@@ -147,13 +158,29 @@ const Component: FC<MainProps> = (props) => {
       })
   }
 
+  console.log("実際")
+  console.log(messageList)
+
   return (
     <>
-      <div className="chatArea"></div>
+      <div className="chatArea">
+        <ChatArea messages={messageList} />
+      </div>
       <div className="giftArea"></div>
       <div className="notificationArea">{notice}</div>
       <div className="versionArea">Loading...</div>
       {/* <audio id='soundGift' preload="auto" src="assets/gift.mp3?200327" itemType="audio/mp3"></audio> */}
+    </>
+  )
+}
+
+const ChatArea: FC<{ messages: any[] }> = (props) => {
+  const { messages } = props
+  return (
+    <>
+      {messages.map((v, i) => (
+        <div key={`${i}`}>{v.message}</div>
+      ))}
     </>
   )
 }

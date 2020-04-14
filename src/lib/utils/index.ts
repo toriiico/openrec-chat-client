@@ -1,14 +1,15 @@
 export class WebSocketManager {
-  readonly id: string
-  readonly uri: string
-  instance: WebSocket
-  handshakeLoop?: NodeJS.Timeout
+  private readonly id: string
+  private readonly uri: string
+  private instance: WebSocket
+  private handshakeLoop?: NodeJS.Timeout
+  private commentObserver: CommentObserver
 
-  constructor(id: string) {
+  constructor(id: string, commentObserver: CommentObserver) {
     this.id = id
     this.uri = "wss://chat.openrec.tv/socket.io/?movieId=" + this.id + "&EIO=3&transport=websocket"
     this.instance = new WebSocket(this.uri)
-    console.log(this.instance)
+    this.commentObserver = commentObserver
   }
 
   connect() {
@@ -71,7 +72,7 @@ export class WebSocketManager {
 
         if (json.type == 0) {
           // コメント
-          let messageJson = new CommentDeliver(json.data)
+          let messageJson = new CommentDeliver(json.data, this.commentObserver)
           messageJson.push()
         } else if (json.type == 1) {
           // 同時接続数と視聴数
@@ -104,24 +105,25 @@ export class WebSocketManager {
 }
 
 export class CommentDeliver {
-  user_name: string
-  user_identify_id: string
-  message: string
-  message_dt: string
-  is_fresh: string
-  is_warned: string
-  is_moderator: string
-  user_type: string
-  is_premium: string
-  is_official: string
-  is_authenticated: string
-  user_icon: string
-  user_color: string
-  stamp: any
-  yell: any
-  yell_type: string
+  private user_name: string
+  private user_identify_id: string
+  private message: string
+  private message_dt: string
+  private is_fresh: string
+  private is_warned: string
+  private is_moderator: string
+  private user_type: string
+  private is_premium: string
+  private is_official: string
+  private is_authenticated: string
+  private user_icon: string
+  private user_color: string
+  private stamp: any
+  private yell: any
+  private yell_type: string
+  private observer: CommentObserver
 
-  constructor(json: any) {
+  constructor(json: any, observer: CommentObserver) {
     this.user_name = removeHtml(json.user_name)
     this.user_identify_id = json.user_identify_id
     this.message = removeHtml(json.message)
@@ -138,6 +140,7 @@ export class CommentDeliver {
     this.stamp = json.stamp
     this.yell = json.yell
     this.yell_type = json.yell_type
+    this.observer = observer
   }
 
   push() {
@@ -150,10 +153,34 @@ export class CommentDeliver {
 
     console.log(this.message)
 
+    this.observer.on({
+      message: this.message,
+    })
+
     // if (this.yell) giftDraw(this.yell.yell_id, 1, this.user_name, this.message)
     // else chatDraw(this.message, this.user_name, this.user_icon, this.user_color, this.stamp)
 
     return
+  }
+}
+
+export class CommentObserver {
+  private _readers: any[]
+
+  constructor() {
+    this._readers = []
+  }
+
+  on(reader: any) {
+    this._readers.push(reader)
+  }
+
+  off(reader: any) {
+    this._readers.splice(this._readers.indexOf(reader), 1)
+  }
+
+  get readers() {
+    return this._readers
   }
 }
 

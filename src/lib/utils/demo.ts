@@ -209,8 +209,8 @@ export const chatTest = (name?: string, text?: string, stampNo?: number, yellNo?
     badges: [],
   }
 
-  let messageJson = new CommentDeliver(provJson)
-  messageJson.push()
+  // let messageJson = new CommentDeliver(provJson)
+  // messageJson.push()
 }
 
 export const demoModeStart = (isYell: boolean) => {
