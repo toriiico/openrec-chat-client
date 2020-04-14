@@ -1,0 +1,230 @@
+import { CommentDeliver } from "."
+
+export const demoTexts = [
+  "こんにちは",
+  "こんばんは",
+  "こんにちわ～",
+  "おじゃまします",
+  "やっほー",
+  "こんばんわ",
+  "今日は何のゲーム？",
+  "888888",
+  "うまい！",
+  "調子いいですね",
+  "今日は早いですね",
+  "めっちゃ早口だw",
+  "wwww",
+  "わろた",
+  "草",
+  "さすがに草",
+  "面白いですね",
+  "初見",
+  "初見です",
+  "やあやあ",
+  "はじめまして",
+  "おー",
+  "なるほど",
+  "これはすごい",
+  "ぬるぽ",
+  "テスト",
+  "コメント流れてる",
+  "てすとてすと",
+  "ツイッターもフォローしました",
+  "チャンネル登録しました",
+  "おばんどす",
+  "どうもありがとうございました。",
+  "おつかれさまです",
+  "おつかれさまでした",
+  "おつかれした",
+]
+
+export const demoNames = [
+  "えま",
+  "しおり",
+  "りお",
+  "はな",
+  "ほのか",
+  "あかり",
+  "ゆい",
+  "はるか",
+  "めい",
+  "りこ",
+  "みお",
+  "さき",
+  "かのん",
+  "かんな",
+  "あやか",
+  "かほ",
+  "さな",
+  "あんな",
+  "さえ",
+  "みのり",
+  "いちか",
+  "ゆう",
+  "さくら",
+  "なお",
+  "ゆうな",
+  "りん",
+  "ひな",
+  "あいり",
+  "なつき",
+  "かえで",
+  "ひかり",
+  "みゆ",
+  "さら",
+  "すみれ",
+  "ゆり",
+  "みさき",
+  "ひまり",
+  "みつき",
+  "かりん",
+  "なな",
+  "ももか",
+  "ふうか",
+  "ゆいか",
+  "ゆな",
+  "りな",
+  "りの",
+  "れいな",
+  "みれい",
+  "せな",
+  "まお",
+  "みう",
+  "ゆいな",
+  "ちひろ",
+  "つむぎ",
+  "ななみ",
+  "かな",
+  "はづき",
+  "みく",
+  "こはる",
+  "ひなこ",
+  "すず",
+  "えな",
+  "すずか",
+  "りおな",
+  "ゆうか",
+  "うた",
+  "かすみ",
+  "まい",
+  "まな",
+  "りんか",
+  "あん",
+  "なぎさ",
+  "ひより",
+  "りりか",
+  "あやね",
+  "ありさ",
+  "ことは",
+  "さやか",
+  "しほ",
+  "ちさ",
+  "りさ",
+  "りほ",
+  "いろは",
+  "みこと",
+  "ゆめ",
+  "あやの",
+  "さほ",
+  "みおり",
+  "あかね",
+  "さや",
+  "ともか",
+  "のぞみ",
+  "ゆき",
+  "れな",
+  "ちさと",
+  "あやな",
+  "まゆ",
+  "みづき",
+  "るな",
+  "わかな",
+]
+
+export const chatTest = (name?: string, text?: string, stampNo?: number, yellNo?: number) => {
+  let stamp: any, yell: any
+
+  if (stampNo) {
+    stamp = {
+      stamp_id: stampNo,
+      group_id: 0,
+      image_url: "https://dqd0jw5gvbchn.cloudfront.net/stamp/15/128/8198d84b09dc00b8afb770941efe8dfd8b3e47d3.png",
+    }
+  } else {
+    stamp = null
+  }
+  if (yellNo) {
+    yell = {
+      yell_id: yellNo,
+      name: "01_winterfood",
+      label: "[公開]_02_winterfood",
+      image_url: "",
+      image_url_small: "",
+      animation_url: "",
+      points: 200,
+      yells: 160,
+      ticker_seconds: 10,
+    }
+  } else {
+    yell = null
+  }
+
+  const provJson = {
+    movie_id: 1623780,
+    live_type: 1,
+    onair_status: 1,
+    user_id: 60404115,
+    openrec_user_id: 509107,
+    user_name: name ?? "TESTER",
+    user_type: "2",
+    user_key: "",
+    user_identify_id: "",
+    user_rank: 0,
+    chat_id: 335388228,
+    item: 0,
+    golds: 0,
+    message: text ?? "TEST",
+    cre_dt: "2020-03-25 18:46:54",
+    message_dt: "2020-03-25 18:46:54",
+    is_fresh: 1,
+    is_warned: 0,
+    is_moderator: 0,
+    is_premium: 1,
+    is_authenticated: 1,
+    has_banned_word: 0,
+    stamp,
+    quality_type: 2,
+    user_icon: "https://dqd0jw5gvbchn.cloudfront.net/tv/v8.11.0/static/images/favicons/favicon.ico",
+    supporter_rank: 0,
+    is_creaters: 0,
+    is_premium_hidden: 0,
+    user_color: "#" + Math.floor(Math.random() * 0xffffff).toString(16),
+    yell,
+    yell_type: null,
+    to_user: null,
+    capture: null,
+    item_data: null,
+    display_dt: "0秒前",
+    del_flg: 0,
+    badges: [],
+  }
+
+  let messageJson = new CommentDeliver(provJson)
+  messageJson.push()
+}
+
+export const demoModeStart = (isYell: boolean) => {
+  let demoYell = 0,
+    demoStamp = 0
+  let demoText = demoTexts[Math.floor(Math.random() * demoTexts.length)]
+  let demoName = demoNames[Math.floor(Math.random() * demoNames.length)]
+  let rnd = Math.floor(Math.random() * 100)
+  if (rnd >= 98) demoYell = 179
+  else if (rnd >= 88) demoStamp = 1
+  if (isYell) demoYell = 179
+
+  chatTest(demoName, demoText, demoStamp, demoYell)
+
+  let rnd2 = Math.floor(Math.random() * 1000)
+  setTimeout(demoModeStart, rnd2)
+}
