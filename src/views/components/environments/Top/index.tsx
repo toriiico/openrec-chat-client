@@ -122,7 +122,7 @@ const Component: FC<MainProps> = () => {
   }
 
   return (
-    <div>
+    <div className="root">
       <h1 id="title-area">OPENREC Chat Client - URL Generator</h1>
 
       <div id="commentary-area">

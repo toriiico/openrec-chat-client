@@ -1,4 +1,4 @@
-body {
+.root {
   background-color: #201e2f;
   color: white;
   font-size: 14px;
@@ -47,6 +47,10 @@ div#param-area {
 
 #commentary-area {
   color: #bebebe;
+}
+
+#title-area {
+  margin-top: 0;
 }
 
 h3 {
