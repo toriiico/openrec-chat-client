@@ -50,6 +50,7 @@ const Component: FC<MainProps> = (props) => {
   const [onairInfo, setOnairInfo] = useState<{ id: string; title: string; channel: string } | null>(null)
   const [giftList, setGiftList] = useState<Array<any> | null>(null)
   const [comments, setComments] = useState<ForOnairComments>([])
+  const [latestComment, setLatestComment] = useState<ForOnairComment>({})
 
   const onairObserverTimerRef = useRef<NodeJS.Timeout>()
   const commentObserverTimerRef = useRef<NodeJS.Timeout>()
@@ -88,6 +89,7 @@ const Component: FC<MainProps> = (props) => {
         // console.log("observer")
         // console.log(comments)
         setComments((prevState) => JSON.parse(JSON.stringify(comments)))
+        setLatestComment(comments[comments.length - 1])
       }, 500)
     }
   }, [onairInfo])
@@ -99,8 +101,22 @@ const Component: FC<MainProps> = (props) => {
   }, [wsManager])
 
   useEffect(() => {
-    console.log("スクロール！")
-    scrollTargetRef.current?.scrollIntoView(false)
+    if (!comments[comments.length - 1]?.chat_id || !latestComment?.chat_id) return
+    if (comments[comments.length - 1].chat_id === latestComment.chat_id) return
+
+    const nowBottom = window.innerHeight + window.scrollY
+    const contentBottom = scrollTargetRef.current?.scrollHeight
+
+    if (!contentBottom) return
+
+    const AUTO_SCROLL_START_MARGIN = 60
+
+    if (nowBottom >= contentBottom - AUTO_SCROLL_START_MARGIN) {
+      console.log("スクロール！")
+      scrollTargetRef.current?.scrollIntoView(false)
+    } else {
+      console.info("オートスクロール無効中")
+    }
   }, [comments])
 
   // 配信情報を取得
