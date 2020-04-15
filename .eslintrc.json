@@ -12,7 +12,11 @@
     "react/prop-types": 0,
     "prettier/prettier": "error",
     "react-hooks/rules-of-hooks": "error",
-    "react-hooks/exhaustive-deps": "warn"
+    "react-hooks/exhaustive-deps": "warn",
+    "no-unneeded-ternary": "error",
+    "no-nested-ternary": "error",
+    "no-mixed-spaces-and-tabs": "error",
+    "no-lonely-if": "error"
   },
   "plugins": ["react", "import", "jsx-a11y", "prettier", "react-hooks"],
   "parser": "babel-eslint",
