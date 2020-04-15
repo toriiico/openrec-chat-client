@@ -14,9 +14,6 @@ import { demoModeStart, chatTest } from "../../../../lib/utils/demo"
 import { updateGiftList, getMovieId, OpenrecCommentResponse } from "../../../../lib/utils/openrec"
 import { stampSize } from "../../../../lib/configs"
 
-const channelId = "Yaritaiji"
-const demoMode = false
-
 // let noticeDraw = (text: string, type: string) => {
 //   if (type == "viewerOnly") return
 //   else renderText.unshift({ text: text, type: type })
@@ -44,7 +41,9 @@ type ForOnairComments = Array<ForOnairComment>
 const Component: FC<MainProps> = (props) => {
   const { location } = props
 
-  const queryParams = new URLSearchParams(location.search)
+  const [queryParams] = useState(new URLSearchParams(location.search))
+  const [channelId] = useState(queryParams.get("channelId"))
+  const [demoMode] = useState(queryParams.get("demoMode"))
 
   const [wsManager, setWsManager] = useState<WebSocketManager | null>(null)
   const [commentObserver, setCommentObserver] = useState<CommentObserver>(new CommentObserver())
@@ -106,6 +105,8 @@ const Component: FC<MainProps> = (props) => {
 
   // 配信情報を取得
   const onairObserver = () => {
+    if (!channelId) return
+
     getMovieId(channelId)
       .then((data) => {
         const nowOnair = data.find((val: any) => val.onair_status === 1)
@@ -129,8 +130,9 @@ const Component: FC<MainProps> = (props) => {
       })
   }
 
-  // console.log("実際")
-  // console.log(comments)
+  if (!channelId) {
+    return <div>チャンネルIDが指定されていません。</div>
+  }
 
   return (
     <>
@@ -148,9 +150,9 @@ const Comments: FC<{ comments: ForOnairComments }> = (props) => {
   return (
     <>
       {comments.map((v, i) => (
-        <div className="comment-row">
+        <div key={`comment-${v.chat_id}`} className="comment-row">
           <div className="comment-wrapper">
-            <Comment key={`comment-${v.user_id}-${v.message_dt}`} comment={v} />
+            <Comment comment={v} />
           </div>
         </div>
       ))}
