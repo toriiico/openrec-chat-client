@@ -14,6 +14,9 @@ import { demoModeStart, chatTest } from "../../../../lib/utils/demo"
 import { updateGiftList, getMovieId, OpenrecCommentResponse } from "../../../../lib/utils/openrec"
 import { stampSize } from "../../../../lib/configs"
 
+const DEFAULT_AUTO_SCROLL_START_MARGIN = 200
+const MIN_AUTO_SCROLL_START_MARGIN = 10
+
 // let noticeDraw = (text: string, type: string) => {
 //   if (type == "viewerOnly") return
 //   else renderText.unshift({ text: text, type: type })
@@ -41,9 +44,15 @@ type ForOnairComments = Array<ForOnairComment>
 const Component: FC<MainProps> = (props) => {
   const { location } = props
 
-  const [queryParams] = useState(new URLSearchParams(location.search))
+  const queryParams = new URLSearchParams(location.search)
   const [channelId] = useState(queryParams.get("channelId"))
-  const [demoMode] = useState(queryParams.get("demoMode"))
+  const [demoMode] = useState<boolean>(queryParams.get("demoMode") === "on")
+  // 0を許容したいのでやや冗長な書き方に
+  const [autoScrollStartMargin, setAutoScrollStartMargin] = useState<number>(
+    queryParams.get("autoScrollStartMargin") && queryParams.get("autoScrollStartMargin") !== ""
+      ? Number(queryParams.get("autoScrollStartMargin"))
+      : DEFAULT_AUTO_SCROLL_START_MARGIN
+  )
 
   const [wsManager, setWsManager] = useState<WebSocketManager | null>(null)
   const [commentObserver, setCommentObserver] = useState<CommentObserver>(new CommentObserver())
@@ -57,6 +66,11 @@ const Component: FC<MainProps> = (props) => {
   const scrollTargetRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
+    // 準備
+    if (autoScrollStartMargin <= MIN_AUTO_SCROLL_START_MARGIN) {
+      setAutoScrollStartMargin(DEFAULT_AUTO_SCROLL_START_MARGIN)
+    }
+
     // ギフト情報取得
     // if (giftList === null) {
     //   updateGiftList().then((data) => {
@@ -109,9 +123,7 @@ const Component: FC<MainProps> = (props) => {
 
     if (!contentBottom) return
 
-    const AUTO_SCROLL_START_MARGIN = 60
-
-    if (nowBottom >= contentBottom - AUTO_SCROLL_START_MARGIN) {
+    if (nowBottom >= contentBottom - autoScrollStartMargin) {
       console.log("スクロール！")
       scrollTargetRef.current?.scrollIntoView(false)
     } else {
