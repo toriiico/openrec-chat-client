@@ -5,7 +5,8 @@
     "plugin:react/recommended",
     "plugin:jsx-a11y/recommended",
     "prettier",
-    "prettier/react"
+    "prettier/react",
+    "stylelint-prettier/recommended"
   ],
   "rules": {
     "react/prop-types": 0,
@@ -13,13 +14,7 @@
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn"
   },
-  "plugins": [
-    "react",
-    "import",
-    "jsx-a11y",
-    "prettier",
-    "react-hooks"
-  ],
+  "plugins": ["react", "import", "jsx-a11y", "prettier", "react-hooks"],
   "parser": "babel-eslint",
   "parserOptions": {
     "ecmaVersion": 2018,
@@ -37,12 +32,7 @@
   "settings": {
     "import/resolver": {
       "node": {
-        "extensions": [
-          ".js",
-          ".jsx",
-          ".ts",
-          ".tsx"
-        ]
+        "extensions": [".js", ".jsx", ".ts", ".tsx", "scss", "css"]
       }
     }
   }
