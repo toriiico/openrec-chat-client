@@ -1,39 +1,23 @@
 import React, { FC, Props, useState, useEffect, useRef } from "react"
 import { RouteComponentProps } from "react-router"
 
-// なぜかファイル読み込みエラー
-// import giftAudio from "../../../../lib/assets/gift.mp3"
-
 import "./index.css"
 
-// TODO: Audioをstateで持つ？
-
 // TODO: 一旦
-import { WebSocketManager, CommentDeliver, removeHtml, CommentObserver } from "../../../../lib/utils"
-import { demoModeStart, chatTest } from "../../../../lib/utils/demo"
-import { updateGiftList, getMovieId, OpenrecCommentResponse } from "../../../../lib/utils/openrec"
+import { WebSocketManager, CommentObserver } from "../../../../lib/utils"
+import {
+  getMovieId,
+  OpenrecCommentResponse,
+  resNormalCommentSample,
+  resStampSample,
+  resYellSample,
+  resCaptureSample,
+} from "../../../../lib/utils/openrec"
 import { stampSize } from "../../../../lib/configs"
 
+const RETRY_CHECK_ONAIR_MILLISEC = 10000
 const DEFAULT_AUTO_SCROLL_START_MARGIN = 200
 const MIN_AUTO_SCROLL_START_MARGIN = 10
-
-// let noticeDraw = (text: string, type: string) => {
-//   if (type == "viewerOnly") return
-//   else renderText.unshift({ text: text, type: type })
-// }
-
-// let requestTextillate = (d) => {
-//   notificationArea.css("left", "110%")
-//   notificationArea.text(removeHtml(d.text))
-//   notificationArea.css("display", "block")
-//   let goalLeft = 20
-
-//   notificationArea.animate({ left: goalLeft }, 1000, "swing", function () {
-//     notificationArea.animate({ left: goalLeft }, 3000, "swing", function () {
-//       notificationArea.fadeOut(200)
-//     })
-//   })
-// }
 
 type MainProps = Props<{}> & RouteComponentProps<any>
 
@@ -44,6 +28,9 @@ type ForOnairComments = Array<ForOnairComment>
 const Component: FC<MainProps> = (props) => {
   const { location } = props
 
+  /**
+   * クエリパラメータ管理
+   */
   const queryParams = new URLSearchParams(location.search)
   const [channelId] = useState(queryParams.get("channelId"))
   const [demoMode] = useState<boolean>(queryParams.get("demoMode") === "on")
@@ -55,9 +42,8 @@ const Component: FC<MainProps> = (props) => {
   )
 
   const [wsManager, setWsManager] = useState<WebSocketManager | null>(null)
-  const [commentObserver, setCommentObserver] = useState<CommentObserver>(new CommentObserver())
+  const [commentObserver] = useState<CommentObserver>(new CommentObserver())
   const [onairInfo, setOnairInfo] = useState<{ id: string; title: string; channel: string } | null>(null)
-  const [giftList, setGiftList] = useState<Array<any> | null>(null)
   const [comments, setComments] = useState<ForOnairComments>([])
   const [latestComment, setLatestComment] = useState<ForOnairComment>({})
 
@@ -71,21 +57,15 @@ const Component: FC<MainProps> = (props) => {
       setAutoScrollStartMargin(DEFAULT_AUTO_SCROLL_START_MARGIN)
     }
 
-    // ギフト情報取得
-    // if (giftList === null) {
-    //   updateGiftList().then((data) => {
-    //     setGiftList(data)
-    //   })
-    // }
-
     // デモ開始
     if (demoMode) {
-      setTimeout(demoModeStart, 1000)
-      setTimeout(chatTest, 1000, "じん", "応援してます！", 0, 179) // デモ用に確定でエールを表示
+      const comment = { message: "デモ配信スタート" }
+      setComments((prevState) => [comment])
+      setComments((prevState) => [resNormalCommentSample, resStampSample, resYellSample, resCaptureSample])
     } else {
       // 本番通信
-      const forOnair = { message: "放送が始まるのを待機しています..." }
-      setComments((prevState) => [...prevState, forOnair])
+      const comment = { message: "配信開始を待っています..." }
+      setComments((prevState) => [comment])
       onairObserver()
     }
 
@@ -94,6 +74,9 @@ const Component: FC<MainProps> = (props) => {
     }
   }, [])
 
+  /**
+   * 配信状況管理
+   */
   useEffect(() => {
     if (onairInfo !== null) {
       setWsManager(new WebSocketManager(onairInfo.id, commentObserver))
@@ -108,12 +91,18 @@ const Component: FC<MainProps> = (props) => {
     }
   }, [onairInfo])
 
+  /**
+   * WebSocket管理
+   */
   useEffect(() => {
     if (wsManager) {
       wsManager.connect()
     }
   }, [wsManager])
 
+  /**
+   * スクロール管理
+   */
   useEffect(() => {
     if (!comments[comments.length - 1]?.chat_id || !latestComment?.chat_id) return
     if (comments[comments.length - 1].chat_id === latestComment.chat_id) return
@@ -131,12 +120,16 @@ const Component: FC<MainProps> = (props) => {
     }
   }, [comments])
 
-  // 配信情報を取得
+  /**
+   * 配信情報の取得処理
+   */
   const onairObserver = () => {
     if (!channelId) return
 
     getMovieId(channelId)
       .then((data) => {
+        console.log(data)
+
         const nowOnair = data.find((val: any) => val.onair_status === 1)
 
         if (nowOnair) {
@@ -148,9 +141,9 @@ const Component: FC<MainProps> = (props) => {
           // console.log("取得できたね")
           // console.log(data)
         } else {
-          console.log("getMovieId success(not onair)")
+          console.log(`Not now onair. retry checking after ${RETRY_CHECK_ONAIR_MILLISEC}ms...`)
           // onairじゃなかったら定期的にオンラインかどうか確認
-          onairObserverTimerRef.current = setTimeout(onairObserver, 10000)
+          onairObserverTimerRef.current = setTimeout(onairObserver, RETRY_CHECK_ONAIR_MILLISEC)
         }
       })
       .catch((err) => {
@@ -158,7 +151,7 @@ const Component: FC<MainProps> = (props) => {
       })
   }
 
-  if (!channelId) {
+  if (!demoMode && !channelId) {
     return <div>チャンネルIDが指定されていません。</div>
   }
 
@@ -167,8 +160,6 @@ const Component: FC<MainProps> = (props) => {
       <div className="chatArea" ref={scrollTargetRef}>
         <Comments comments={comments} />
       </div>
-      <div className="giftArea"></div>
-      {/* <audio id='soundGift' preload="auto" src="assets/gift.mp3?200327" itemType="audio/mp3"></audio> */}
     </>
   )
 }
@@ -199,11 +190,22 @@ const Comment: FC<{ comment: ForOnairComment }> = (props) => {
     )
   }
 
+  if (comment.capture) {
+    return (
+      <div>
+        <img src={comment.capture.capture.thumbnail_url} className="capture" />
+        <span>{comment.message}</span>
+        <span>{comment.capture.capture.title}</span>
+      </div>
+    )
+  }
+
   if (comment.yell) {
     return (
       <div>
+        <div>{comment.message}</div>
         <img src={comment.yell.image_url} className="yell" />
-        <span>{comment.message}</span>
+        <span>{comment.yell.yells}</span>
       </div>
     )
   }

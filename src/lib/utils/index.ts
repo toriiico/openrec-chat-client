@@ -1,17 +1,17 @@
-import { OpenrecCommentResponse } from "./openrec"
+import { OpenrecCommentResponse, OpenrecCaptureResponse } from "./openrec"
 
 export class WebSocketManager {
   private readonly id: string
   private readonly uri: string
   private instance: WebSocket
   private handshakeLoop?: NodeJS.Timeout
-  private commentObserver: CommentObserver
+  private commentObserverRef: CommentObserver
 
-  constructor(id: string, commentObserver: CommentObserver) {
+  constructor(id: string, commentObserverRef: CommentObserver) {
     this.id = id
     this.uri = "wss://chat.openrec.tv/socket.io/?movieId=" + this.id + "&EIO=3&transport=websocket"
     this.instance = new WebSocket(this.uri)
-    this.commentObserver = commentObserver
+    this.commentObserverRef = commentObserverRef
   }
 
   connect() {
@@ -37,7 +37,9 @@ export class WebSocketManager {
 
   onOpen(e: Event) {
     console.log("CONNECTED")
-    // noticeDraw("[接続] " + onairChannel + "/" + onairTitle, "open")
+    this.commentObserverRef.on({
+      message: "チャットサーバーと接続しました。コメントの取得を開始します。",
+    })
     this.handshakeLoop = setInterval(() => {
       // NOTE: 関数直入れはthis参照がおかしくなるので、関数内関数として定義する
       this.handshake()
@@ -46,7 +48,6 @@ export class WebSocketManager {
 
   onClose(e: CloseEvent) {
     console.log("DISCONNECTED")
-    // noticeDraw("[切断] " + onairChannel + "/" + onairTitle, "close")
     if (this.handshakeLoop) clearInterval(this.handshakeLoop)
   }
 
@@ -74,7 +75,7 @@ export class WebSocketManager {
 
         if (json.type == 0) {
           // コメント
-          let messageJson = new CommentDeliver(json.data, this.commentObserver)
+          let messageJson = new CommentDeliver(json.data, this.commentObserverRef)
           messageJson.push()
         } else if (json.type == 1) {
           // 同時接続数と視聴数
@@ -111,7 +112,7 @@ export class CommentDeliver {
   private observer: CommentObserver
 
   constructor(json: OpenrecCommentResponse, observer: CommentObserver) {
-    console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+    console.log("================= ================================= ==========================")
     console.log(json)
     this.info = json
     this.observer = observer
@@ -136,18 +137,20 @@ export class CommentDeliver {
   }
 }
 
+type CommentObserverReader = Partial<OpenrecCaptureResponse>
+
 export class CommentObserver {
-  private _readers: OpenrecCommentResponse[]
+  private _readers: CommentObserverReader[]
 
   constructor() {
     this._readers = []
   }
 
-  on(reader: OpenrecCommentResponse) {
+  on(reader: CommentObserverReader) {
     this._readers.push(reader)
   }
 
-  off(reader: OpenrecCommentResponse) {
+  off(reader: CommentObserverReader) {
     this._readers.splice(this._readers.indexOf(reader), 1)
   }
 

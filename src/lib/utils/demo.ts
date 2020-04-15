@@ -1,5 +1,3 @@
-import { CommentDeliver } from "."
-
 export const demoTexts = [
   "こんにちは",
   "こんばんは",
