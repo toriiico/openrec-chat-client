@@ -54,6 +54,7 @@ const Component: FC<MainProps> = (props) => {
 
   const onairObserverTimerRef = useRef<NodeJS.Timeout>()
   const commentObserverTimerRef = useRef<NodeJS.Timeout>()
+  const scrollTargetRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     // ギフト情報取得
@@ -98,6 +99,11 @@ const Component: FC<MainProps> = (props) => {
     }
   }, [wsManager])
 
+  useEffect(() => {
+    console.log("スクロール！")
+    scrollTargetRef.current?.scrollIntoView(false)
+  }, [comments])
+
   // 配信情報を取得
   const onairObserver = () => {
     getMovieId(channelId)
@@ -128,7 +134,7 @@ const Component: FC<MainProps> = (props) => {
 
   return (
     <>
-      <div className="chatArea">
+      <div className="chatArea" ref={scrollTargetRef}>
         <Comments comments={comments} />
       </div>
       <div className="giftArea"></div>
