@@ -34,6 +34,7 @@ a:visited {
 
 div#param-area {
   line-height: 35px;
+  padding-bottom: 60px;
 }
 
 #option-text {
@@ -49,8 +50,10 @@ div#param-area {
   color: #bebebe;
 }
 
-#title-area {
+#title-area > h1 {
+  display: inline-block;
   margin-top: 0;
+  margin-right: 20px;
 }
 
 h3 {
