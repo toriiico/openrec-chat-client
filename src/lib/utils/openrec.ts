@@ -9,32 +9,32 @@ export const getMovieId = async (channelId: string) => {
 }
 
 // どんな値が入ってくるのか大体わかりやすくするためのもの
-type BooleanNumber = number
-type NumberString = string
-type FloatNumber = number
-type DateString = string
-type TimeString = string
-type UrlString = string
-type UrlAfterDirNameString = string
-type ColorCodeString = string
+export type BooleanNumber = number
+export type NumberString = string
+export type FloatNumber = number
+export type DateString = string
+export type TimeString = string
+export type UrlString = string
+export type UrlAfterDirNameString = string
+export type ColorCodeString = string
 
-type YellType = string | null
-type LastUpdatedAt = DateString | null
+export type YellType = string | null
+export type LastUpdatedAt = DateString | null
 
 // 何が入ってくるか分からないもの
 // デフォがnull
-type UnknownParam = any
+export type UnknownParam = any
 // 数値が入ってくることは判明しているがboolとして扱ってそうだったり不定そうなもの
-type UnknownNumber = number
+export type UnknownNumber = number
 // 中身が不明
-type ThumbnailUrls = any[]
+export type ThumbnailUrls = any[]
 
-type StampInfo = {
+export type StampInfo = {
   stamp_id: number
   group_id: number
   image_url: UrlString
 } | null
-type YellInfo = {
+export type YellInfo = {
   yell_id: number
   name: string
   label: string
@@ -45,7 +45,7 @@ type YellInfo = {
   yells: number
   ticker_seconds: number
 } | null
-type ChannelInfo = {
+export type ChannelInfo = {
   id: string
   openrec_user_id: number
   recxuser_id: number
@@ -74,7 +74,7 @@ type ChannelInfo = {
   email: UnknownParam
   twitter_screen_name: UnknownParam
 } | null
-type CaptureInfo = {
+export type CaptureInfo = {
   capture: {
     id: string
     movie_start_point: TimeString
@@ -97,8 +97,8 @@ type CaptureInfo = {
   capture_channel: ChannelInfo
 } | null
 // NOTE: これよく分からん
-type ItemDataInfo = {} | null
-type BadgesInfo = {
+export type ItemDataInfo = {} | null
+export type BadgesInfo = {
   id: number
   image_url: UrlString
   label: string
@@ -109,7 +109,7 @@ type BadgesInfo = {
   }
 }[]
 
-type OpenrecCommentResponse = {
+export type OpenrecCommentResponse = {
   movie_id: number
   live_type: number
   onair_status: number
@@ -149,7 +149,7 @@ type OpenrecCommentResponse = {
   badges: BadgesInfo
 }
 
-type OpenrecCaptureResponse = Omit<OpenrecCommentResponse, "item" | "golds" | "message_dt" | "quality_type">
+export type OpenrecCaptureResponse = Omit<OpenrecCommentResponse, "item" | "golds" | "message_dt" | "quality_type">
 
 // コメントサンプル
 // NOTE: badgeは特殊なものがある場合のみ追加される（サブスクマークなど）

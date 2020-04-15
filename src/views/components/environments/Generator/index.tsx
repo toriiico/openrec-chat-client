@@ -11,23 +11,11 @@ import "./index.css"
 // TODO: 一旦
 import { WebSocketManager, CommentDeliver, removeHtml, CommentObserver } from "../../../../lib/utils"
 import { demoModeStart, chatTest } from "../../../../lib/utils/demo"
-import { currentVer } from "../../../../lib/configs"
-import { updateGiftList, getMovieId } from "../../../../lib/utils/openrec"
+import { updateGiftList, getMovieId, OpenrecCommentResponse } from "../../../../lib/utils/openrec"
+import { stampSize } from "../../../../lib/configs"
 
-const channelId = "Tori_baado"
+const channelId = "Yaritaiji"
 const demoMode = false
-
-/////////////////////////////////////////////////////////
-////////////            宣言                  ///////////
-////////////////////////////////////////////////////////
-
-// const notificationArea = $(".notificationArea")
-let mainLoop
-let renderText = []
-
-/////////////////////////////////////////////////////////
-////////////            function             ////////////
-////////////////////////////////////////////////////////
 
 // let noticeDraw = (text: string, type: string) => {
 //   if (type == "viewerOnly") return
@@ -47,34 +35,11 @@ let renderText = []
 //   })
 // }
 
-// let checkFunc = () => {
-//   if (renderText.length) {
-//     let feedAreaDisplay = notificationArea.css("display")
-//     if (feedAreaDisplay == "none") {
-//       requestTextillate(renderText[0])
-//       renderText.splice(0, 1)
-//     }
-//   }
-// }
-
-// let versionDisplay = () => {
-//   $(".versionArea").text(currentVer)
-//   setTimeout(() => {
-//     $(".versionArea").fadeOut(1000)
-//   }, 2000)
-// }
-
-/////////////////////////////////////////////////////////
-////////////            メイン処理            ////////////
-////////////////////////////////////////////////////////
-
-// $(document).ready(function () {
-//   mainLoop = setInterval(checkFunc, 1000)
-//   startConnect()
-//   versionDisplay()
-// })
-
 type MainProps = Props<{}> & RouteComponentProps<any>
+
+// コメントによって内容が結構変わったりするので、
+type ForOnairComment = Partial<OpenrecCommentResponse>
+type ForOnairComments = Array<ForOnairComment>
 
 const Component: FC<MainProps> = (props) => {
   const { location } = props
@@ -84,15 +49,14 @@ const Component: FC<MainProps> = (props) => {
   const [wsManager, setWsManager] = useState<WebSocketManager | null>(null)
   const [commentObserver, setCommentObserver] = useState<CommentObserver>(new CommentObserver())
   const [onairInfo, setOnairInfo] = useState<{ id: string; title: string; channel: string } | null>(null)
-  const [notice, setNotice] = useState("")
   const [giftList, setGiftList] = useState<Array<any> | null>(null)
-  const [messageList, setMessageList] = useState<Array<any>>([])
+  const [comments, setComments] = useState<ForOnairComments>([])
 
   const onairObserverTimerRef = useRef<NodeJS.Timeout>()
   const commentObserverTimerRef = useRef<NodeJS.Timeout>()
 
   useEffect(() => {
-    // get gift list
+    // ギフト情報取得
     // if (giftList === null) {
     //   updateGiftList().then((data) => {
     //     setGiftList(data)
@@ -105,7 +69,8 @@ const Component: FC<MainProps> = (props) => {
       setTimeout(chatTest, 1000, "じん", "応援してます！", 0, 179) // デモ用に確定でエールを表示
     } else {
       // 本番通信
-      setNotice("放送が始まるのを待機しています...")
+      const forOnair = { message: "放送が始まるのを待機しています..." }
+      setComments((prevState) => [...prevState, forOnair])
       onairObserver()
     }
 
@@ -120,20 +85,20 @@ const Component: FC<MainProps> = (props) => {
 
       commentObserverTimerRef.current = setInterval(() => {
         const comments = commentObserver.readers
-        console.log("observer")
-        console.log(comments)
-        setMessageList((prevState) => [...comments])
+        // console.log("observer")
+        // console.log(comments)
+        setComments((prevState) => JSON.parse(JSON.stringify(comments)))
       }, 500)
     }
   }, [onairInfo])
 
   useEffect(() => {
     if (wsManager) {
-      console.log("セツゾク")
       wsManager.connect()
     }
   }, [wsManager])
 
+  // 配信情報を取得
   const onairObserver = () => {
     getMovieId(channelId)
       .then((data) => {
@@ -145,44 +110,69 @@ const Component: FC<MainProps> = (props) => {
             title: nowOnair.title,
             channel: nowOnair.channel.name,
           })
-          console.log("取得できたね")
-          console.log(data)
+          // console.log("取得できたね")
+          // console.log(data)
         } else {
           console.log("getMovieId success(not onair)")
-          // onairじゃなかったら定期的に取得
-          onairObserverTimerRef.current = setTimeout(onairObserver, 7000)
+          // onairじゃなかったら定期的にオンラインかどうか確認
+          onairObserverTimerRef.current = setTimeout(onairObserver, 10000)
         }
       })
       .catch((err) => {
-        throw new Error("Failed get movie id.")
+        throw new Error("Failed get movie id. Please check if it is a valid user ID.")
       })
   }
 
-  console.log("実際")
-  console.log(messageList)
+  // console.log("実際")
+  // console.log(comments)
 
   return (
     <>
       <div className="chatArea">
-        <ChatArea messages={messageList} />
+        <Comments comments={comments} />
       </div>
       <div className="giftArea"></div>
-      <div className="notificationArea">{notice}</div>
-      <div className="versionArea">Loading...</div>
       {/* <audio id='soundGift' preload="auto" src="assets/gift.mp3?200327" itemType="audio/mp3"></audio> */}
     </>
   )
 }
 
-const ChatArea: FC<{ messages: any[] }> = (props) => {
-  const { messages } = props
+const Comments: FC<{ comments: ForOnairComments }> = (props) => {
+  const { comments } = props
   return (
     <>
-      {messages.map((v, i) => (
-        <div key={`${i}`}>{v.message}</div>
+      {comments.map((v, i) => (
+        <div className="comment-row">
+          <div className="comment-wrapper">
+            <Comment key={`comment-${v.user_id}-${v.message_dt}`} comment={v} />
+          </div>
+        </div>
       ))}
     </>
   )
+}
+
+const Comment: FC<{ comment: ForOnairComment }> = (props) => {
+  const { comment } = props
+
+  if (comment.stamp) {
+    return (
+      <div>
+        <img src={comment.stamp.image_url} className="stamp" style={{ width: stampSize }} />
+      </div>
+    )
+  }
+
+  if (comment.yell) {
+    return (
+      <div>
+        <img src={comment.yell.image_url} className="yell" />
+        <span>{comment.message}</span>
+      </div>
+    )
+  }
+
+  return <div>{comment.message}</div>
 }
 
 export default Component

@@ -1,3 +1,5 @@
+import { OpenrecCommentResponse } from "./openrec"
+
 export class WebSocketManager {
   private readonly id: string
   private readonly uri: string
@@ -105,59 +107,27 @@ export class WebSocketManager {
 }
 
 export class CommentDeliver {
-  private user_name: string
-  private user_identify_id: string
-  private message: string
-  private message_dt: string
-  private is_fresh: string
-  private is_warned: string
-  private is_moderator: string
-  private user_type: string
-  private is_premium: string
-  private is_official: string
-  private is_authenticated: string
-  private user_icon: string
-  private user_color: string
-  private stamp: any
-  private yell: any
-  private yell_type: string
+  private info: OpenrecCommentResponse
   private observer: CommentObserver
 
-  constructor(json: any, observer: CommentObserver) {
+  constructor(json: OpenrecCommentResponse, observer: CommentObserver) {
     console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
     console.log(json)
-    this.user_name = removeHtml(json.user_name)
-    this.user_identify_id = json.user_identify_id
-    this.message = removeHtml(json.message)
-    this.message_dt = json.message_dt
-    this.is_fresh = json.is_fresh
-    this.is_warned = json.is_warned
-    this.is_moderator = json.is_moderator
-    this.user_type = json.user_type
-    this.is_premium = json.is_premium
-    this.is_official = json.is_official
-    this.is_authenticated = json.is_authenticated
-    this.user_icon = json.user_icon
-    this.user_color = json.user_color
-    this.stamp = json.stamp
-    this.yell = json.yell
-    this.yell_type = json.yell_type
+    this.info = json
     this.observer = observer
   }
 
   push() {
     let svgUrlBase = "https://dqd0jw5gvbchn.cloudfront.net/tv/v8.11.0/static/svg/commons"
-    if (this.user_type == "1") this.user_name += '<img src="' + svgUrlBase + '/official.svg" class="mark">'
-    if (this.is_premium) this.user_name += '<img src="' + svgUrlBase + '/premium.svg" class="mark">'
-    if (this.is_moderator) this.user_name += '<img src="' + svgUrlBase + '/moderator.svg" class="mark">'
-    if (this.is_fresh) this.user_name += '<img src="' + svgUrlBase + '/begginer.svg" class="mark">'
-    if (this.is_warned) this.user_name += '<img src="' + svgUrlBase + '/warned.svg" class="mark">'
+    if (this.info.user_type === "1") this.info.user_name += '<img src="' + svgUrlBase + '/official.svg" class="mark">'
+    if (this.info.is_premium) this.info.user_name += '<img src="' + svgUrlBase + '/premium.svg" class="mark">'
+    if (this.info.is_moderator) this.info.user_name += '<img src="' + svgUrlBase + '/moderator.svg" class="mark">'
+    if (this.info.is_fresh) this.info.user_name += '<img src="' + svgUrlBase + '/begginer.svg" class="mark">'
+    if (this.info.is_warned) this.info.user_name += '<img src="' + svgUrlBase + '/warned.svg" class="mark">'
 
-    console.log(this.message)
+    console.log(this.info.message)
 
-    this.observer.on({
-      message: this.message,
-    })
+    this.observer.on(this.info)
 
     // if (this.yell) giftDraw(this.yell.yell_id, 1, this.user_name, this.message)
     // else chatDraw(this.message, this.user_name, this.user_icon, this.user_color, this.stamp)
@@ -167,17 +137,17 @@ export class CommentDeliver {
 }
 
 export class CommentObserver {
-  private _readers: any[]
+  private _readers: OpenrecCommentResponse[]
 
   constructor() {
     this._readers = []
   }
 
-  on(reader: any) {
+  on(reader: OpenrecCommentResponse) {
     this._readers.push(reader)
   }
 
-  off(reader: any) {
+  off(reader: OpenrecCommentResponse) {
     this._readers.splice(this._readers.indexOf(reader), 1)
   }
 
