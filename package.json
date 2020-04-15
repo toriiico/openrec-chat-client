@@ -20,10 +20,11 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "build2docs": "build2docs.bat",
     "test": "react-scripts test",
     "lint": "eslint --ext .js,.jsx,.ts,.tsx src --color",
     "format": "prettier --write src/**/*.{ts,tsx,scss,css,json}",
-    "isready": "npm run format && npm run lint && npm run build"
+    "release": "npm run format && npm run lint && npm run build && npm run build2docs"
   },
   "browserslist": {
     "production": [
