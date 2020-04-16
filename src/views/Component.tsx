@@ -1,8 +1,8 @@
-import React from "react"
+import React, { FC } from "react"
 
 import Router from "../routers/Router"
 
-const App = () => {
+const App: FC<{}> = () => {
   return <Router />
 }
 

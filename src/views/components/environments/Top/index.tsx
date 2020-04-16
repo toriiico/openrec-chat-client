@@ -33,7 +33,7 @@ const defaultFormValues: FormValues = {
   demoMode: false,
 }
 
-const generateOutputUrl = (values: FormValues, preview?: boolean) => {
+const generateOutputUrl = (values: FormValues, preview?: boolean): string => {
   let paramText = "?channelId=" + values.channelId
   if (values.chatInUserName) paramText += "&chatInUserName=" + values.chatInUserName
   if (values.chatColorMode) paramText += "&chatColorMode=" + values.chatColorMode
@@ -309,8 +309,8 @@ const Component: FC<MainProps> = () => {
       <div id="iframe-area">
         <iframe
           title="preview"
-          // src="./generator.html?channelId=a&chatSpeed=7000&chatLengthMax=30&giftNoticeMode=true&giftNoticeFeederMode=true&giftSpeed=5000&demoMode=true"
-          src={previewUrl}
+          src="/#/generator?demoMode=on&autoScrollStartMargin=500"
+          // src={previewUrl}
           frameBorder="1"
           width="1920"
           height="1080"

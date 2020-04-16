@@ -13,6 +13,11 @@ import {
   resCaptureSample,
 } from "../../../../lib/utils/openrec"
 
+// TODO: クエリパラメータを手動更新したら良い感じに再設定できるかどうか
+//       Xsplit上で行うとどういう挙動になるか確認（要点はリロードかかるのかどうか）
+// TODO: コメントが一定数以上の数になったら削除できるように（パラメータで上限指定可能に）
+// TODO: Top画面からパラメータ指定するように（下記のデフォルト値などもTop画面依存とする）
+
 // 配信者がオフラインだった場合に配信されているか再確認する間隔
 const RETRY_CHECK_ONAIR_MILLISEC = 10000
 // 自動スクロール判定の高さ。自動スクロール中に指定数値ピクセル分過去にスクロールすると自動スクロールが無効化されます。（表現難しい。。。）
@@ -41,21 +46,20 @@ const Component: FC<MainProps> = (props) => {
   const [channelId] = useState(queryParams.get("channelId"))
   const [demoMode] = useState<boolean>(queryParams.get("demoMode") === "on")
   // 0を許容したいのでやや冗長な書き方に
-  const [autoScrollStartMargin, setAutoScrollStartMargin] = useState<number>(
+  const autoScrollStartMargin =
     queryParams.get("autoScrollStartMargin") && queryParams.get("autoScrollStartMargin") !== ""
       ? Number(queryParams.get("autoScrollStartMargin"))
       : DEFAULT_AUTO_SCROLL_START_MARGIN
-  )
-  const [autoScrollInterval] = useState(
-    queryParams.get("autoScrollInterval") ? Number(queryParams.get("autoScrollInterval")) : DEFAULT_AUTO_SCROLL_INTERVAL
-  )
+  const autoScrollInterval = queryParams.get("autoScrollInterval")
+    ? Number(queryParams.get("autoScrollInterval"))
+    : DEFAULT_AUTO_SCROLL_INTERVAL
 
-  const [style] = useState<CommentStyle>({
+  const style = {
     textSize: queryParams.get("textSize") ? Number(queryParams.get("textSize")) : DEFAULT_TEXT_SIZE,
     stampSize: queryParams.get("stampSize") ? Number(queryParams.get("stampSize")) : DEFAULT_STAMP_SIZE,
     yellSize: queryParams.get("yellSize") ? Number(queryParams.get("yellSize")) : DEFAULT_YELL_SIZE,
     captureSize: queryParams.get("captureSize") ? Number(queryParams.get("captureSize")) : DEFAULT_CAPTURE_SIZE,
-  })
+  }
 
   const [wsManager, setWsManager] = useState<WebSocketManager | null>(null)
   const [commentObserver] = useState<CommentObserver>(new CommentObserver())
@@ -67,15 +71,19 @@ const Component: FC<MainProps> = (props) => {
   const autoScrollTimerRef = useRef<NodeJS.Timeout>()
   const scrollTargetRef = useRef<HTMLDivElement | null>(null)
 
+  const nowBottom = window.innerHeight + window.scrollY
+  const contentBottom = scrollTargetRef.current?.scrollHeight
+
+  console.log(window.innerHeight, window.scrollY, nowBottom, contentBottom)
+
   useEffect(() => {
     // デモ開始
     if (demoMode) {
-      const comment: ForOnairComment = { message: "デモ配信スタート", chat_id: new Date().getTime() }
-      setComments((prevState) => [comment])
-      setInterval(() => {
-        const comment: ForOnairComment = { message: "tekitou", chat_id: new Date().getTime() }
-        // setComments((prevState) => [...prevState, comment])
-      }, 1000)
+      const comment: ForOnairComment = {
+        message: "デモ配信スタート（channelIdは無視されます）",
+        chat_id: new Date().getTime(),
+      }
+      setComments([comment])
 
       setInterval(() => {
         setComments((prevState) => [...prevState, { ...resNormalCommentSample, chat_id: new Date().getTime() }])
@@ -86,7 +94,7 @@ const Component: FC<MainProps> = (props) => {
     } else {
       // 本番通信
       const comment = { message: "配信開始を待っています..." }
-      setComments((prevState) => [comment])
+      setComments([comment])
       onairObserver()
     }
 
@@ -94,6 +102,18 @@ const Component: FC<MainProps> = (props) => {
       wsManager?.disconnect()
     }
   }, [])
+
+  /**
+   * クエリイベント管理
+   */
+  useEffect(() => {
+    if (channelId !== queryParams.get("channelId")) {
+      window.location.reload()
+    }
+    if (demoMode !== (queryParams.get("demoMode") === "on")) {
+      window.location.reload()
+    }
+  }, [location])
 
   /**
    * 配信状況管理
@@ -104,7 +124,7 @@ const Component: FC<MainProps> = (props) => {
 
       commentObserverTimerRef.current = setInterval(() => {
         const comments = commentObserver.readers
-        setComments((prevState) => JSON.parse(JSON.stringify(comments)))
+        setComments(JSON.parse(JSON.stringify(comments)))
       }, 500)
     }
   }, [onairInfo])
@@ -129,6 +149,7 @@ const Component: FC<MainProps> = (props) => {
       if (!contentBottom) return
 
       if (autoScrollStartMargin === 0 || nowBottom >= contentBottom - autoScrollStartMargin) {
+        console.log("スクロール")
         scrollTargetRef.current?.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" })
       }
     }, autoScrollInterval)
@@ -137,7 +158,7 @@ const Component: FC<MainProps> = (props) => {
   /**
    * 配信情報の取得処理
    */
-  const onairObserver = () => {
+  const onairObserver = (): void => {
     if (!channelId) return
 
     getMovieId(channelId)
@@ -169,8 +190,10 @@ const Component: FC<MainProps> = (props) => {
 
   return (
     <>
-      <div className="chatArea" ref={scrollTargetRef}>
-        <Comments comments={comments} style={style} />
+      <div className="chatArea-wrapper">
+        <div className="chatArea" ref={scrollTargetRef}>
+          <Comments comments={comments} style={style} />
+        </div>
       </div>
     </>
   )
@@ -208,7 +231,7 @@ const Comment: FC<{ comment: ForOnairComment; style: CommentStyle }> = (props) =
           src={comment.stamp.image_url}
           alt={comment.stamp.image_url}
           className="stamp"
-          style={{ width: style.stampSize }}
+          style={{ height: style.stampSize }}
         />
       </div>
     )
@@ -221,7 +244,7 @@ const Comment: FC<{ comment: ForOnairComment; style: CommentStyle }> = (props) =
           src={comment.capture.capture.thumbnail_url}
           alt={comment.capture.capture.thumbnail_url}
           className="capture"
-          style={{ width: style.captureSize }}
+          style={{ height: style.captureSize }}
         />
         <span>{comment.message}</span>
         <span>{comment.capture.capture.title}</span>
@@ -237,7 +260,7 @@ const Comment: FC<{ comment: ForOnairComment; style: CommentStyle }> = (props) =
           src={comment.yell.image_url}
           alt={comment.yell.image_url}
           className="yell"
-          style={{ width: style.yellSize }}
+          style={{ height: style.yellSize }}
         />
         <span>{comment.yell.yells}</span>
       </div>
