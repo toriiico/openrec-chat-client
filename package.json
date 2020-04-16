@@ -1,5 +1,6 @@
 {
   "name": "app",
+  "homepage": "https://toriiico.github.io/openrec-chat-client",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
