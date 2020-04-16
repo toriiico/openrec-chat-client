@@ -309,7 +309,7 @@ const Component: FC<MainProps> = () => {
       <div id="iframe-area">
         <iframe
           title="preview"
-          src="/#/generator?demoMode=on&autoScrollStartMargin=500"
+          src="/openrec-chat-client/#/generator?demoMode=on&autoScrollStartMargin=500"
           // src={previewUrl}
           frameBorder="1"
           width="1920"
