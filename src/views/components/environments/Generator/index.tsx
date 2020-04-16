@@ -3,7 +3,6 @@ import { RouteComponentProps } from "react-router"
 
 import "./index.css"
 
-// TODO: 一旦
 import { WebSocketManager, CommentObserver } from "../../../../lib/utils"
 import {
   getMovieId,
@@ -13,11 +12,18 @@ import {
   resYellSample,
   resCaptureSample,
 } from "../../../../lib/utils/openrec"
-import { stampSize } from "../../../../lib/configs"
 
+// 配信者がオフラインだった場合に配信されているか再確認する間隔
 const RETRY_CHECK_ONAIR_MILLISEC = 10000
-const DEFAULT_AUTO_SCROLL_START_MARGIN = 200
-const MIN_AUTO_SCROLL_START_MARGIN = 10
+// 自動スクロール判定の高さ。自動スクロール中に指定数値ピクセル分過去にスクロールすると自動スクロールが無効化されます。（表現難しい。。。）
+// スクロール判定間隔が短いと無効化が難しくなります。テキストやスタンプサイズにも影響されます。
+const DEFAULT_AUTO_SCROLL_START_MARGIN = 1000
+// スクロール判定間隔。少ないほど頻繁にスクロール実行確認および実行を行います。間隔を短くするほどパフォーマンスに影響します。
+const DEFAULT_AUTO_SCROLL_INTERVAL = 500
+const DEFAULT_TEXT_SIZE = 14
+const DEFAULT_STAMP_SIZE = 100
+const DEFAULT_YELL_SIZE = 100
+const DEFAULT_CAPTURE_SIZE = 100
 
 type MainProps = Props<{}> & RouteComponentProps<any>
 
@@ -40,28 +46,45 @@ const Component: FC<MainProps> = (props) => {
       ? Number(queryParams.get("autoScrollStartMargin"))
       : DEFAULT_AUTO_SCROLL_START_MARGIN
   )
+  const [autoScrollInterval] = useState(
+    !!queryParams.get("autoScrollInterval")
+      ? Number(queryParams.get("autoScrollInterval"))
+      : DEFAULT_AUTO_SCROLL_INTERVAL
+  )
+
+  const [style] = useState<CommentStyle>({
+    textSize: !!queryParams.get("textSize") ? Number(queryParams.get("textSize")) : DEFAULT_TEXT_SIZE,
+    stampSize: !!queryParams.get("stampSize") ? Number(queryParams.get("stampSize")) : DEFAULT_STAMP_SIZE,
+    yellSize: !!queryParams.get("yellSize") ? Number(queryParams.get("yellSize")) : DEFAULT_YELL_SIZE,
+    captureSize: !!queryParams.get("captureSize") ? Number(queryParams.get("captureSize")) : DEFAULT_CAPTURE_SIZE,
+  })
 
   const [wsManager, setWsManager] = useState<WebSocketManager | null>(null)
   const [commentObserver] = useState<CommentObserver>(new CommentObserver())
   const [onairInfo, setOnairInfo] = useState<{ id: string; title: string; channel: string } | null>(null)
   const [comments, setComments] = useState<ForOnairComments>([])
-  const [latestComment, setLatestComment] = useState<ForOnairComment>({})
 
   const onairObserverTimerRef = useRef<NodeJS.Timeout>()
   const commentObserverTimerRef = useRef<NodeJS.Timeout>()
+  const autoScrollTimerRef = useRef<NodeJS.Timeout>()
   const scrollTargetRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
-    // 準備
-    if (autoScrollStartMargin <= MIN_AUTO_SCROLL_START_MARGIN) {
-      setAutoScrollStartMargin(DEFAULT_AUTO_SCROLL_START_MARGIN)
-    }
-
     // デモ開始
     if (demoMode) {
-      const comment = { message: "デモ配信スタート" }
+      const comment: ForOnairComment = { message: "デモ配信スタート", chat_id: new Date().getTime() }
       setComments((prevState) => [comment])
-      setComments((prevState) => [resNormalCommentSample, resStampSample, resYellSample, resCaptureSample])
+      setInterval(() => {
+        const comment: ForOnairComment = { message: "tekitou", chat_id: new Date().getTime() }
+        // setComments((prevState) => [...prevState, comment])
+      }, 1000)
+
+      setInterval(() => {
+        setComments((prevState) => [...prevState, { ...resNormalCommentSample, chat_id: new Date().getTime() }])
+        setComments((prevState) => [...prevState, { ...resStampSample, chat_id: new Date().getTime() }])
+        setComments((prevState) => [...prevState, { ...resYellSample, chat_id: new Date().getTime() }])
+        setComments((prevState) => [...prevState, { ...resCaptureSample, chat_id: new Date().getTime() }])
+      }, 3000)
     } else {
       // 本番通信
       const comment = { message: "配信開始を待っています..." }
@@ -83,10 +106,7 @@ const Component: FC<MainProps> = (props) => {
 
       commentObserverTimerRef.current = setInterval(() => {
         const comments = commentObserver.readers
-        // console.log("observer")
-        // console.log(comments)
         setComments((prevState) => JSON.parse(JSON.stringify(comments)))
-        setLatestComment(comments[comments.length - 1])
       }, 500)
     }
   }, [onairInfo])
@@ -104,21 +124,17 @@ const Component: FC<MainProps> = (props) => {
    * スクロール管理
    */
   useEffect(() => {
-    if (!comments[comments.length - 1]?.chat_id || !latestComment?.chat_id) return
-    if (comments[comments.length - 1].chat_id === latestComment.chat_id) return
+    autoScrollTimerRef.current = setInterval(() => {
+      const nowBottom = window.innerHeight + window.scrollY
+      const contentBottom = scrollTargetRef.current?.scrollHeight
 
-    const nowBottom = window.innerHeight + window.scrollY
-    const contentBottom = scrollTargetRef.current?.scrollHeight
+      if (!contentBottom) return
 
-    if (!contentBottom) return
-
-    if (nowBottom >= contentBottom - autoScrollStartMargin) {
-      console.log("スクロール！")
-      scrollTargetRef.current?.scrollIntoView(false)
-    } else {
-      console.info("オートスクロール無効中")
-    }
-  }, [comments])
+      if (autoScrollStartMargin === 0 || nowBottom >= contentBottom - autoScrollStartMargin) {
+        scrollTargetRef.current?.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" })
+      }
+    }, autoScrollInterval)
+  }, [])
 
   /**
    * 配信情報の取得処理
@@ -138,8 +154,6 @@ const Component: FC<MainProps> = (props) => {
             title: nowOnair.title,
             channel: nowOnair.channel.name,
           })
-          // console.log("取得できたね")
-          // console.log(data)
         } else {
           console.log(`Not now onair. retry checking after ${RETRY_CHECK_ONAIR_MILLISEC}ms...`)
           // onairじゃなかったら定期的にオンラインかどうか確認
@@ -158,20 +172,27 @@ const Component: FC<MainProps> = (props) => {
   return (
     <>
       <div className="chatArea" ref={scrollTargetRef}>
-        <Comments comments={comments} />
+        <Comments comments={comments} style={style} />
       </div>
     </>
   )
 }
 
-const Comments: FC<{ comments: ForOnairComments }> = (props) => {
-  const { comments } = props
+type CommentStyle = {
+  textSize: number
+  stampSize: number
+  yellSize: number
+  captureSize: number
+}
+
+const Comments: FC<{ comments: ForOnairComments; style: CommentStyle }> = (props) => {
+  const { comments, style } = props
   return (
     <>
       {comments.map((v, i) => (
         <div key={`comment-${v.chat_id}`} className="comment-row">
-          <div className="comment-wrapper">
-            <Comment comment={v} />
+          <div className="comment-wrapper" style={{ fontSize: style.textSize }}>
+            <Comment comment={v} style={style} />
           </div>
         </div>
       ))}
@@ -179,13 +200,13 @@ const Comments: FC<{ comments: ForOnairComments }> = (props) => {
   )
 }
 
-const Comment: FC<{ comment: ForOnairComment }> = (props) => {
-  const { comment } = props
+const Comment: FC<{ comment: ForOnairComment; style: CommentStyle }> = (props) => {
+  const { comment, style } = props
 
   if (comment.stamp) {
     return (
       <div>
-        <img src={comment.stamp.image_url} className="stamp" style={{ width: stampSize }} />
+        <img src={comment.stamp.image_url} className="stamp" style={{ width: style.stampSize }} />
       </div>
     )
   }
@@ -193,7 +214,7 @@ const Comment: FC<{ comment: ForOnairComment }> = (props) => {
   if (comment.capture) {
     return (
       <div>
-        <img src={comment.capture.capture.thumbnail_url} className="capture" />
+        <img src={comment.capture.capture.thumbnail_url} className="capture" style={{ width: style.captureSize }} />
         <span>{comment.message}</span>
         <span>{comment.capture.capture.title}</span>
       </div>
@@ -204,7 +225,7 @@ const Comment: FC<{ comment: ForOnairComment }> = (props) => {
     return (
       <div>
         <div>{comment.message}</div>
-        <img src={comment.yell.image_url} className="yell" />
+        <img src={comment.yell.image_url} className="yell" style={{ width: style.yellSize }} />
         <span>{comment.yell.yells}</span>
       </div>
     )
