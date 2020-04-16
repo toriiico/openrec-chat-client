@@ -309,7 +309,9 @@ const Component: FC<MainProps> = () => {
       <div id="iframe-area">
         <iframe
           title="preview"
-          src="/openrec-chat-client/#/generator?demoMode=on&autoScrollStartMargin=500"
+          src={`${
+            process.env.NODE_ENV === "production" ? `/${process.env.REACT_APP_PROJECT_NAME}` : ""
+          }/#/generator?demoMode=on&autoScrollStartMargin=500`}
           // src={previewUrl}
           frameBorder="1"
           width="1920"
