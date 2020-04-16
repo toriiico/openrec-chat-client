@@ -1,14 +1,14 @@
 {
   "files": {
     "main.css": "/openrec-chat-client/static/css/main.c821ad27.chunk.css",
-    "main.js": "/openrec-chat-client/static/js/main.0105c5f4.chunk.js",
-    "main.js.map": "/openrec-chat-client/static/js/main.0105c5f4.chunk.js.map",
+    "main.js": "/openrec-chat-client/static/js/main.77e99930.chunk.js",
+    "main.js.map": "/openrec-chat-client/static/js/main.77e99930.chunk.js.map",
     "runtime-main.js": "/openrec-chat-client/static/js/runtime-main.f9efdae4.js",
     "runtime-main.js.map": "/openrec-chat-client/static/js/runtime-main.f9efdae4.js.map",
     "static/js/2.603defbb.chunk.js": "/openrec-chat-client/static/js/2.603defbb.chunk.js",
     "static/js/2.603defbb.chunk.js.map": "/openrec-chat-client/static/js/2.603defbb.chunk.js.map",
     "index.html": "/openrec-chat-client/index.html",
-    "precache-manifest.491a81f2dc67b1291ad3579f764513a3.js": "/openrec-chat-client/precache-manifest.491a81f2dc67b1291ad3579f764513a3.js",
+    "precache-manifest.900f8ddc60341397aba14127d2b9ca2d.js": "/openrec-chat-client/precache-manifest.900f8ddc60341397aba14127d2b9ca2d.js",
     "service-worker.js": "/openrec-chat-client/service-worker.js",
     "static/css/main.c821ad27.chunk.css.map": "/openrec-chat-client/static/css/main.c821ad27.chunk.css.map",
     "static/js/2.603defbb.chunk.js.LICENSE.txt": "/openrec-chat-client/static/js/2.603defbb.chunk.js.LICENSE.txt"
@@ -17,6 +17,6 @@
     "static/js/runtime-main.f9efdae4.js",
     "static/js/2.603defbb.chunk.js",
     "static/css/main.c821ad27.chunk.css",
-    "static/js/main.0105c5f4.chunk.js"
+    "static/js/main.77e99930.chunk.js"
   ]
 }

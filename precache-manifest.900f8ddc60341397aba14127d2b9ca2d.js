@@ -1,10 +1,10 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "482f2a2c06e96939e583b06c98cb2335",
+    "revision": "d983db2e056b86815359ce9f53da3e6a",
     "url": "/openrec-chat-client/index.html"
   },
   {
-    "revision": "67ec5b2f57b8f1af5016",
+    "revision": "1a9784d132c849a3dbfe",
     "url": "/openrec-chat-client/static/css/main.c821ad27.chunk.css"
   },
   {
@@ -16,8 +16,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/openrec-chat-client/static/js/2.603defbb.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "67ec5b2f57b8f1af5016",
-    "url": "/openrec-chat-client/static/js/main.0105c5f4.chunk.js"
+    "revision": "1a9784d132c849a3dbfe",
+    "url": "/openrec-chat-client/static/js/main.77e99930.chunk.js"
   },
   {
     "revision": "50d78ab2d8eeebad71ac",

@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/openrec-chat-client/precache-manifest.491a81f2dc67b1291ad3579f764513a3.js"
+  "/openrec-chat-client/precache-manifest.900f8ddc60341397aba14127d2b9ca2d.js"
 );
 
 self.addEventListener('message', (event) => {
