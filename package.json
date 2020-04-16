@@ -20,7 +20,8 @@
     "test": "react-scripts test",
     "lint": "eslint --ext .js,.jsx,.ts,.tsx ./src --color",
     "format": "prettier --write src/**/*.{ts,tsx,scss,css,json}",
-    "release": "npm run format && npm run lint && npm run build && npm run build2docs"
+    "predeploy": "npm run format && npm run lint && npm run build",
+    "deploy": "gh-pages -d build"
   },
   "browserslist": {
     "production": [
@@ -48,6 +49,7 @@
     "eslint-plugin-prettier": "3.1.2",
     "eslint-plugin-react": "7.19.0",
     "eslint-plugin-react-hooks": "3.0.0",
+    "gh-pages": "^2.2.0",
     "node-sass": "^4.13.1",
     "prettier": "2.0.4",
     "react-scripts": "3.4.1",
