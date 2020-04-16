@@ -5,8 +5,7 @@
     "plugin:react/recommended",
     "plugin:jsx-a11y/recommended",
     "prettier",
-    "prettier/react",
-    "stylelint-prettier/recommended"
+    "prettier/react"
   ],
   "rules": {
     "react/prop-types": 0,
