@@ -27,23 +27,23 @@
     <div id="param-area">
         <span id="option-text">設定</span><br>
         <span class="param-text2">チャンネルID: <input type="text" placeholder="必須" value="" class="inputBox" id="inp-channelId">※https://www.openrec.tv/user/***** ←ここの部分</span><br>
-        
+
         <label><input id="chk-chatInUserName" class="chkbx" type="checkbox"><span class="chkbx-parts">流れるコメントに@名前を含める</span></label><br>
 
         <label><input id="chk-chatColorMode" class="chkbx" type="checkbox"><span class="chkbx-parts">流れるコメントの色をユーザが設定した色にする</span></label><br>
-        
+
         <span class="param-text2">流れるコメントの大きさ: <input type="text" placeholder="" value="60" class="inputBox" id="inp-chatSize">px</span><br>
-        
+
         <span class="param-text2">流れるスタンプの大きさ: <input type="text" placeholder="" value="128" class="inputBox" id="inp-stampSize">px</span><br>
-        
+
         <span class="param-text2">コメントが流れる速度: <input type="text" placeholder="" value="7000" class="inputBox" id="inp-chatSpeed">※少ないほど早い</span><br>
-        
+
         <span class="param-text2">コメントの最大表示文字数: <input type="text" placeholder="" value="30" class="inputBox" id="inp-chatLengthMax">※超えた分は省略して表示</span><br>
-        
+
         <label><input id="chk-giftNoticeMode" class="chkbx" type="checkbox" checked><span class="chkbx-parts">エールがきたら画面上から降ってくる</span></label><br>
-        
+
         <label><input id="chk-giftNoticeFeederMode" class="chkbx" type="checkbox" checked><span class="chkbx-parts">エールがきたら画面下に詳細が流れる</span></label><br>
-        
+
         <span class="param-text2">エールが落ちる速度: <input type="text" placeholder="" value="5000" class="inputBox" id="inp-giftSpeed">※少ないほど早い</span><br>
 
         <label><input id="chk-giftNoticeSound" class="chkbx" type="checkbox"><span class="chkbx-parts">エールが来た時に音を鳴らす</span></label>※PREVIEWだとならないかも<br>
@@ -61,12 +61,12 @@
     <div id="copied-text">
         コピーしました
     </div>
-    
+
     <span class="preview-text">PREVIEW</span>
     <div id="iframe-area">
         <iframe src="./generator.html?channelId=a&chatSpeed=7000&chatLengthMax=30&giftNoticeMode=true&giftNoticeFeederMode=true&giftSpeed=5000&demoMode=true" frameborder="1" width="1920" height="1080" style="transform:scale(0.25);-o-transform:scale(0.25);-webkit-transform:scale(0.25);-moz-transform:scale(0.25);-ms-transform:scale(0.25);transform-origin:0 0;-o-transform-origin:0 0;-webkit-transform-origin:0 0;-moz-transform-origin:0 0;-ms-transform-origin:0 0;" id="previewFrame"></iframe>
     </div>
-    
+
     <script src="js/jquery-3.4.1.min.js"></script>
     <script src="./setting.js?200404"></script>
     <script src="js/index.js?200404"></script>
