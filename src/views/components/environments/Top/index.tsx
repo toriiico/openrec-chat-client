@@ -308,6 +308,7 @@ const Component: FC<MainProps> = () => {
       <span className="preview-text">PREVIEW</span>
       <div id="iframe-area">
         <iframe
+          title="preview"
           // src="./generator.html?channelId=a&chatSpeed=7000&chatLengthMax=30&giftNoticeMode=true&giftNoticeFeederMode=true&giftSpeed=5000&demoMode=true"
           src={previewUrl}
           frameBorder="1"

@@ -6,11 +6,11 @@ import Generator from "../../views/components/environments/Generator"
 
 interface MainProps extends React.Props<{}> {}
 
-const FComponent: React.FC<MainProps> = (props: MainProps) => {
+const FComponent: React.FC<MainProps> = () => {
   return (
     <Router>
       <Switch>
-        <Route exact={true} path="/" render={(props) => <Top />} />
+        <Route exact={true} path="/" render={() => <Top />} />
         <Route exact={true} path="/generator" render={(props) => <Generator {...props} />} />
 
         <Redirect to="/" />
