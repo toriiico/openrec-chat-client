@@ -19,7 +19,13 @@
     "no-unneeded-ternary": "error",
     "no-nested-ternary": "error",
     "no-mixed-spaces-and-tabs": "error",
-    "no-lonely-if": "error"
+    "no-lonely-if": "error",
+
+    "camelcase": "off",
+    "@typescript-eslint/camelcase": "off",
+
+    "no-use-before-define": "off",
+    "@typescript-eslint/no-use-before-define": "off"
   },
   "plugins": ["react", "import", "jsx-a11y", "prettier", "react-hooks", "@typescript-eslint"],
   "parser": "@typescript-eslint/parser",

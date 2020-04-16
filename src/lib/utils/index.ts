@@ -32,7 +32,10 @@ export class WebSocketManager {
   disconnect() {
     try {
       this.instance.close()
-    } catch (e) {}
+    } catch (e) {
+      console.error(e)
+      throw new Error("Failed disconnect websocket.")
+    }
   }
 
   onOpen(e: Event) {
@@ -75,7 +78,7 @@ export class WebSocketManager {
 
         if (json.type == 0) {
           // コメント
-          let messageJson = new CommentDeliver(json.data, this.commentObserverRef)
+          const messageJson = new CommentDeliver(json.data, this.commentObserverRef)
           messageJson.push()
         } else if (json.type == 1) {
           // 同時接続数と視聴数
@@ -119,7 +122,7 @@ export class CommentDeliver {
   }
 
   push() {
-    let svgUrlBase = "https://dqd0jw5gvbchn.cloudfront.net/tv/v8.11.0/static/svg/commons"
+    const svgUrlBase = "https://dqd0jw5gvbchn.cloudfront.net/tv/v8.11.0/static/svg/commons"
     if (this.info.user_type === "1") this.info.user_name += '<img src="' + svgUrlBase + '/official.svg" class="mark">'
     if (this.info.is_premium) this.info.user_name += '<img src="' + svgUrlBase + '/premium.svg" class="mark">'
     if (this.info.is_moderator) this.info.user_name += '<img src="' + svgUrlBase + '/moderator.svg" class="mark">'

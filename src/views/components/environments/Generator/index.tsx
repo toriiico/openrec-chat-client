@@ -47,16 +47,14 @@ const Component: FC<MainProps> = (props) => {
       : DEFAULT_AUTO_SCROLL_START_MARGIN
   )
   const [autoScrollInterval] = useState(
-    !!queryParams.get("autoScrollInterval")
-      ? Number(queryParams.get("autoScrollInterval"))
-      : DEFAULT_AUTO_SCROLL_INTERVAL
+    queryParams.get("autoScrollInterval") ? Number(queryParams.get("autoScrollInterval")) : DEFAULT_AUTO_SCROLL_INTERVAL
   )
 
   const [style] = useState<CommentStyle>({
-    textSize: !!queryParams.get("textSize") ? Number(queryParams.get("textSize")) : DEFAULT_TEXT_SIZE,
-    stampSize: !!queryParams.get("stampSize") ? Number(queryParams.get("stampSize")) : DEFAULT_STAMP_SIZE,
-    yellSize: !!queryParams.get("yellSize") ? Number(queryParams.get("yellSize")) : DEFAULT_YELL_SIZE,
-    captureSize: !!queryParams.get("captureSize") ? Number(queryParams.get("captureSize")) : DEFAULT_CAPTURE_SIZE,
+    textSize: queryParams.get("textSize") ? Number(queryParams.get("textSize")) : DEFAULT_TEXT_SIZE,
+    stampSize: queryParams.get("stampSize") ? Number(queryParams.get("stampSize")) : DEFAULT_STAMP_SIZE,
+    yellSize: queryParams.get("yellSize") ? Number(queryParams.get("yellSize")) : DEFAULT_YELL_SIZE,
+    captureSize: queryParams.get("captureSize") ? Number(queryParams.get("captureSize")) : DEFAULT_CAPTURE_SIZE,
   })
 
   const [wsManager, setWsManager] = useState<WebSocketManager | null>(null)
@@ -206,7 +204,12 @@ const Comment: FC<{ comment: ForOnairComment; style: CommentStyle }> = (props) =
   if (comment.stamp) {
     return (
       <div>
-        <img src={comment.stamp.image_url} className="stamp" style={{ width: style.stampSize }} />
+        <img
+          src={comment.stamp.image_url}
+          alt={comment.stamp.image_url}
+          className="stamp"
+          style={{ width: style.stampSize }}
+        />
       </div>
     )
   }
@@ -214,7 +217,12 @@ const Comment: FC<{ comment: ForOnairComment; style: CommentStyle }> = (props) =
   if (comment.capture) {
     return (
       <div>
-        <img src={comment.capture.capture.thumbnail_url} className="capture" style={{ width: style.captureSize }} />
+        <img
+          src={comment.capture.capture.thumbnail_url}
+          alt={comment.capture.capture.thumbnail_url}
+          className="capture"
+          style={{ width: style.captureSize }}
+        />
         <span>{comment.message}</span>
         <span>{comment.capture.capture.title}</span>
       </div>
@@ -225,7 +233,12 @@ const Comment: FC<{ comment: ForOnairComment; style: CommentStyle }> = (props) =
     return (
       <div>
         <div>{comment.message}</div>
-        <img src={comment.yell.image_url} className="yell" style={{ width: style.yellSize }} />
+        <img
+          src={comment.yell.image_url}
+          alt={comment.yell.image_url}
+          className="yell"
+          style={{ width: style.yellSize }}
+        />
         <span>{comment.yell.yells}</span>
       </div>
     )

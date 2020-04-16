@@ -4,7 +4,7 @@ import { HashRouter as Router, Redirect, Route, Switch } from "react-router-dom"
 import Top from "../../views/components/environments/Top"
 import Generator from "../../views/components/environments/Generator"
 
-interface MainProps extends React.Props<{}> {}
+type MainProps = React.Props<{}>
 
 const FComponent: React.FC<MainProps> = () => {
   return (
